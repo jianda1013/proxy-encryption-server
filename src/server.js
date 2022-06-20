@@ -1,7 +1,7 @@
-const AES = require("crypto-js").AES;
 const httpProxy = require('http-proxy');
 const http = require('http');
 const express = require('express');
+let CryptoJS = require("crypto-js");
 
 const proxy = httpProxy.createProxyServer({})
 const app = express();
@@ -18,17 +18,25 @@ proxy.on("proxyReq", (proxyReq, req, res) => {
 })
 
 proxy.on("proxyRes", (proxyRes, req, res) => {
-    proxyRes.on("data", (buffer) => {
-        let data = buffer.toString('utf8');
-        console.log(data);
-    })
+    let _write = res.write, output, body = "";
+    proxyRes.on('data', data => {
+        data = data.toString('utf-8');
+        data = { data: CryptoJS.AES.encrypt(JSON.stringify(data), "test").toString() };
+        body += JSON.stringify(data);
+    });
+    res.write = () => {
+        eval("output=" + body)
+        res.setHeader('content-length', JSON.stringify(output).length);
+        _write.call(res, JSON.stringify(output));
+    }
 })
 
 app.use((req, res) => {
-    req.body = { data: AES.encrypt(JSON.stringify(req.body), "test").toString() };
+    req.body = CryptoJS.AES.decrypt(req.body.data, "test").toString(CryptoJS.enc.Utf8);
+    req.body = JSON.parse(req.body);
     proxy.web(req, res, { target: 'http://127.0.0.1:8181' })
 });
 
-http.createServer(app).listen(1337, '0.0.0.0', () => {
-    console.log('Proxy server linsten on 1337');
+http.createServer(app).listen(8080, '0.0.0.0', () => {
+    console.log('Proxy server linsten on 8080');
 });
