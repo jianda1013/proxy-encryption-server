@@ -1,3 +1,5 @@
 {
-    "prime": "d8q9uX0kqK6PTaofFOiOlD1eRgTzrHWEjfwWOWhmAo8jp2VFLEhfzTZ0Cc7G6JI1"
+    "prime": "d8q9uX0kqK6PTaofFOiOlD1eRgTzrHWEjfwWOWhmAo8jp2VFLEhfzTZ0Cc7G6JI1",
+    "target": "http://127.0.0.1:8080",
+    "port": 1337
 }
